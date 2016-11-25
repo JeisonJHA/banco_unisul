@@ -1,0 +1,13 @@
+{% extends 'banco_unisul/base.html' %}
+{% block title %}Cadastro de Socios{% endblock %}
+{% block cad_socio %}active{% endblock %}
+
+{% block body %}
+    <div class="active">
+        <ul>
+            <li><a href="{% url 'banco_unisul:cad_socio' %}"><span aria-hidden="true"></span>&nbsp; Novo Socio</a></li>
+            <li><a href="{% url 'banco_unisul:alt_socio' %}"><span aria-hidden="true"></span>&nbsp; Altera Socio</a></li>
+            <li><a href="{% url 'banco_unisul:exc_socio' %}"><span aria-hidden="true"></span>&nbsp; Exclui Socio</a></li>
+        </ul>
+    </div>
+{% endblock %}

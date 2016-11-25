@@ -1,0 +1,16 @@
+{% extends 'banco_unisul/base.html' %}
+{% block title %}Cadastro de Clientes{% endblock %}
+{% block cad_cliente %}active{% endblock %}
+
+{% block body %}
+    <div class="active">
+        <ul>
+            <li><a href="{% url 'banco_unisul:clientepf-add' %}"><span aria-hidden="true"></span>&nbsp; Nova Pessoa Física</a></li>
+            <li><a href="{% url 'banco_unisul:clientepj-add' %}"><span aria-hidden="true"></span>&nbsp; Nova Pessoa Jurídica</a></li>
+            <li><a href="{% url 'banco_unisul:clientepf-update' %}"><span aria-hidden="true"></span>&nbsp; Altera Pessoa Física</a></li>
+            <li><a href="{% url 'banco_unisul:clientepj-update' %}"><span aria-hidden="true"></span>&nbsp; Altera Pessoa Jurídica</a></li>
+            <li><a href="{% url 'banco_unisul:clientepf-delete' %}"><span aria-hidden="true"></span>&nbsp; Apagar Pessoa Física</a></li>
+            <li><a href="{% url 'banco_unisul:clientepj-delete' %}"><span aria-hidden="true"></span>&nbsp; Apagar Pessoa Jurídica</a></li>
+        </ul>
+    </div>
+{% endblock %}
