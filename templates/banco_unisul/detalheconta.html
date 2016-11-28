@@ -1,0 +1,11 @@
+{% extends 'banco_unisul/baseinterno.html' %}
+{% block title %}Detalhe Conta{% endblock %}
+{% block cad_cliente %}active{% endblock %}
+
+{% block body %}
+    <div class="col-sm-12">
+        {{ conta.cliente }} -
+        {% if conta.tpconta == 1 %}Conta Corrente{% endif %}{% if conta.tpconta == 2 %}Conta Poupanca{% endif %}
+        - {{ conta.saldo }} - {{ conta.flespecial }} - {{ conta.chespecial }}
+    </div>
+{% endblock %}

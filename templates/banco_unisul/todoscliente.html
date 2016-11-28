@@ -1,0 +1,23 @@
+{% extends 'banco_unisul/baseinterno.html' %}
+{% block title %}Cadastro de Clientes{% endblock %}
+{% block cad_cliente %}active{% endblock %}
+
+{% block body %}
+    {% if todos_clientes %}
+        <h1 class="col-sm-12">Lista de Clientes</h1>
+        {% for cliente in todos_clientes %}
+            <div class="col-sm-10">
+                <ul>
+                    {% if cliente.is_PJ %}<li><a href="{% url 'banco_unisul:detalhepj' cliente.id %}"><span aria-hidden="true"></span>{{ cliente.nome }}</a></li>
+                    {% else %}<li><a href="{% url 'banco_unisul:detalhepf' cliente.id %}"><span aria-hidden="true"></span>{{ cliente.nome }}</a></li>{% endif %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div>
+            <h2>
+                Não existe clientes cadastrados.
+            </h2>
+        </div>
+    {% endif %}
+{% endblock %}

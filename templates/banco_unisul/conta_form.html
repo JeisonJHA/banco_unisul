@@ -1,5 +1,6 @@
 {% extends 'banco_unisul/baseinterno.html' %}
-{% block title %}Novo Cliente{% endblock %}
+{% block title %}Nova Conta{% endblock %}
+{% block cad_conta %}active{% endblock %}
 
 {% block body %}
     <div class="container-fluid">
@@ -11,7 +12,7 @@
 
                         <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {% include 'banco_unisul/form-template.html' %}
+                            {% include 'banco_unisul/form-template.html' with cliente=conta.cliente %}
                             <div class="form-group">
                                 <div class=" col-sm-offset2 col-sm-10">
                                     <button type="submit" class="btn btn-success">Salvar</button>

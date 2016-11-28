@@ -1,13 +1,13 @@
-{% extends 'banco_unisul/base.html' %}
+{% extends 'banco_unisul/baseinterno.html' %}
 {% block title %}Cadastro de Conta{% endblock %}
 {% block cad_conta %}active{% endblock %}
 
 {% block body %}
     <div class="active">
         <ul>
-            <li><a href="{% url 'banco_unisul:cad_conta' %}"><span aria-hidden="true"></span>&nbsp; Nova Conta</a></li>
-            <li><a href="{% url 'banco_unisul:alt_conta' %}"><span aria-hidden="true"></span>&nbsp; Altera Conta</a></li>
-            <li><a href="{% url 'banco_unisul:exc_conta' %}"><span aria-hidden="true"></span>&nbsp; Exclui Conta</a></li>
+            <li><a href="{% url 'banco_unisul:conta-add' %}"><span aria-hidden="true"></span>Nova Conta</a></li>
+            <li><a href="{% url 'banco_unisul:listaconta' %}"><span aria-hidden="true"></span>Altera Conta</a></li>
+            <li><a href="{% url 'banco_unisul:listaexcluiconta' %}"><span aria-hidden="true"></span>Exclui Conta</a></li>
         </ul>
     </div>
 {% endblock %}

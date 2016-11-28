@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <title>{% block title %}Banco Unisul{% endblock %}</title>
     {% load staticfiles %}
-{#    <link rel="shortcut icon" type="image/png" href="{%  static 'favicon.ico' %}"/>#}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="{% static 'banco_unisul/style.css' %}"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-{#    <script src="{% static 'banco_unisul/js/main.js' %}"></script>#}
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -31,14 +28,12 @@
         <div class="collapse navbar-collapse" id="topNavBar">
             <ul class="nav navbar-nav">
                 {% block menu %}
+                <li class="{% block cad_cliente %}{% endblock %}"><a href="{% url 'banco_unisul:cad_cliente' %}"><span aria-hidden="true"></span>&nbsp; Cliente</a></li>
+                <li class="{% block cad_conta %}{% endblock %}"><a href="{% url 'banco_unisul:cad_conta' %}"><span aria-hidden="true"></span>&nbsp; Conta</a></li>
+                <li class="{% block cad_socio %}{% endblock %}"><a href="{% url 'banco_unisul:cad_socio' %}"><span aria-hidden="true"></span>&nbsp; Socio</a></li>
+                <li class="{% block relatorio %}{% endblock %}"><a href="{% url 'banco_unisul:relatorio' %}"><span aria-hidden="true"></span>&nbsp; Relatorio</a></li>
                 {% endblock %}
             </ul>
-{#            <form class="navbar-form navbar-left" role="search" method="get" action="{% url 'banco_unisul:index' %}">#}
-{#                <div class="form-group">#}
-{#                    <input type="text" class="form-control" name="q" value="{{ request.GET.q }}">#}
-{#                </div>#}
-{#                <button type="submit" class="btn btn-default">Search</button>#}
-{#            </form>#}
             <ul class="nav navbar-nav navbar-right">
                 <li>
                     <a href="{% url 'banco_unisul:logout_user' %}">

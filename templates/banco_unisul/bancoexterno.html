@@ -1,0 +1,6 @@
+{% extends 'banco_unisul/base.html' %}
+{% block menu %}
+<li class="{% block cad_cliente %}{% endblock %}"><a href="{% url 'banco_unisul:deposito-add' %}"><span aria-hidden="true"></span>&nbsp; Deposito</a></li>
+<li class="{% block cad_conta %}{% endblock %}"><a href="{% url 'banco_unisul:transferencia-add' %}"><span aria-hidden="true"></span>&nbsp; Transferencia</a></li>
+<li class="{% block cad_socio %}{% endblock %}"><a href="{% url 'banco_unisul:saque-add' %}"><span aria-hidden="true"></span>&nbsp; Saque</a></li>
+{% endblock %}

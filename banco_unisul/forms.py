@@ -22,7 +22,7 @@ class ContaForm(forms.ModelForm):
 
     class Meta:
         model = Conta
-        fields = ['cliente', 'saldo', 'tpConta', 'flespecial', 'chespecial']
+        fields = ['cliente', 'saldo', 'tpconta', 'flespecial', 'chespecial']
 
 
 class SocioForm(forms.ModelForm):

@@ -1,16 +1,17 @@
-{% extends 'banco_unisul/base.html' %}
+{% extends 'banco_unisul/baseinterno.html' %}
 {% block title %}Cadastro de Clientes{% endblock %}
 {% block cad_cliente %}active{% endblock %}
 
 {% block body %}
     <div class="active">
         <ul>
-            <li><a href="{% url 'banco_unisul:clientepf-add' %}"><span aria-hidden="true"></span>&nbsp; Nova Pessoa Física</a></li>
-            <li><a href="{% url 'banco_unisul:clientepj-add' %}"><span aria-hidden="true"></span>&nbsp; Nova Pessoa Jurídica</a></li>
-            <li><a href="{% url 'banco_unisul:clientepf-update' %}"><span aria-hidden="true"></span>&nbsp; Altera Pessoa Física</a></li>
-            <li><a href="{% url 'banco_unisul:clientepj-update' %}"><span aria-hidden="true"></span>&nbsp; Altera Pessoa Jurídica</a></li>
-            <li><a href="{% url 'banco_unisul:clientepf-delete' %}"><span aria-hidden="true"></span>&nbsp; Apagar Pessoa Física</a></li>
-            <li><a href="{% url 'banco_unisul:clientepj-delete' %}"><span aria-hidden="true"></span>&nbsp; Apagar Pessoa Jurídica</a></li>
+            <li><a href="{% url 'banco_unisul:todoscliente' %}"><span aria-hidden="true"></span> Listar Clientes</a></li>
+            <li><a href="{% url 'banco_unisul:clientepf-add' %}"><span aria-hidden="true"></span> Nova Pessoa Física</a></li>
+            <li><a href="{% url 'banco_unisul:clientepj-add' %}"><span aria-hidden="true"></span> Nova Pessoa Jurídica</a></li>
+            <li><a href="{% url 'banco_unisul:alteraclientepf' %}"><span aria-hidden="true"></span> Altera Pessoa Física</a></li>
+            <li><a href="{% url 'banco_unisul:alteraclientepj' %}"><span aria-hidden="true"></span> Altera Pessoa Jurídica</a></li>
+            <li><a href="{% url 'banco_unisul:listaexcluiclientepf' %}"><span aria-hidden="true"></span> Apagar Pessoa Física</a></li>
+            <li><a href="{% url 'banco_unisul:listaexcluiclientepj' %}"><span aria-hidden="true"></span> Apagar Pessoa Jurídica</a></li>
         </ul>
     </div>
 {% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'banco_unisul/baseinterno.html' %}
+{% block title %}Detalhe Cliente{% endblock %}
+{% block cad_cliente %}active{% endblock %}
+
+{% block body %}
+    {% csrf_token %}
+    <div class="col-sm-12" xmlns="http://www.w3.org/1999/html">
+        <h1>Empresa</h1>
+        {{ cliente.nome }}
+        <h4>Endereço</h4>
+        {{ cliente.endereco }}
+        <h4>Agência</h4>
+        {{ cliente.agencia }}
+        <h4>CNPJ</h4>
+        {{ CNPJ }}
+        {% if cliente.conta_set.all %}
+            {% for conta in cliente.conta_set.all %}
+                <h4>Saldo</h4>
+                {% if conta.tpconta == 1 %}Conta Corrente{% endif %}{% if conta.tpconta == 2 %}Conta Poupanca{% endif %}
+                <a href="{% url 'banco_unisul:detalheconta' conta.id %}"><span aria-hidden="true"></span> R$ {{ conta.saldo }}</a><br>
+                {% if conta.tpconta == 1 and conta.flespecial %}Cheque especial R$ {{ conta.chespecial }}<br>{% endif %}
+            {% endfor %}
+        {% else %}
+            <a href="{% url 'banco_unisul:conta-add' cliente.id %}"><span aria-hidden="true"></span>&nbsp; Criar Conta</a>
+        {% endif %}
+        {% if socios %}
+            <h3>Sócios</h3>
+            <ul>
+            {% for socio in socios %}
+                <li>{{ socio.cliente.nome }}</li>
+            {% endfor %}
+            <a href="{% url 'banco_unisul:empresa_socio' cliente.id %}">Adicionar Sócio</a>
+            </ul>
+        {% else %}
+            <p>
+                Esta empresa não possui sócios
+            </p>
+        {% endif %}
+
+    </div>
+{% endblock %}

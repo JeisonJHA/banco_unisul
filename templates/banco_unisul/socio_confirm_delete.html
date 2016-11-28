@@ -1,0 +1,20 @@
+{% extends 'banco_unisul/bancointero.html' %}
+{% block title %}Exclusão Socio{% endblock %}
+{% block cad_socio%}active{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-sm12 col-md-7">
+                <div class="panel panel-default">
+                    <form class="form-horizontal" action="" method="post">{% csrf_token %}
+                        <p>Você confirma a exclusão de "{{ object }}"?</p>
+                        <input class="btn btn-success" type="submit" value="Confirma" />
+                        <button onclick="window.history.back();" class="btn btn-danger" type="button">Cancela</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

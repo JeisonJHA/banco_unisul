@@ -1,0 +1,25 @@
+{% extends 'banco_unisul/baseinterno.html' %}
+{% block title %}Alterar dados de Clientes{% endblock %}
+{% block cad_cliente %}active{% endblock %}
+
+{% block body %}
+    {% if clientes %}
+        <div class="active">
+            <ul>
+                {% for cliente in clientes %}
+                    <li><a href="{% url 'banco_unisul:clientepj-update' cliente.id %}"><span aria-hidden="true"></span>{{ cliente.nome }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div class="col-sm-12">
+            <h3>Não existe cliente cadastrado.</h3>
+            <br>
+            <a href="{% url 'banco_unisul:clientepj-add' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp; Criar Cliente
+                </button>
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
