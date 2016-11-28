@@ -1,9 +1,26 @@
 {% for field in form %}
     <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <span class="text-danger small">{{ field.errors }}</span>
+    {% if field.name != 'dtsaque' %}
+            <div class="col-sm-offset-2 col-sm-10">
+                <span class="text-danger small">{{ field.errors }}</span>
+            </div>
+            <label class="control-label col-sm-2">{{ field.label_tag }}</label>
+            <div class="col-sm-10">{{ field }}</div>
+    {% else %}
+        <div class="form-row field-dtdeposito">
+            <fieldset class="module aligned ">
+                <div class="col-sm-10">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <span class="text-danger small">{{ field.errors }}</span>
+                    </div>
+                    <label class="control-label col-sm-2">{{ field.label_tag }}</label>
+                    <p class="datetime">
+                        Dia: <input class="vDateField" id="id_{{ field.name }}" name="{{ field.name }}" size="10" type="text" required "/><br />
+                        Hora: <input class="vTimeField " id="id_{{ field.name }}" name="{{ field.name }}" size="8" type="text" required />
+                    </p>
+                </div>
+            </fieldset>
         </div>
-        <label class="control-label col-sm-2">{{ field.label_tag }}</label>
-        <div class="col-sm-10">{{ field }}</div>
+    {% endif %}
     </div>
 {% endfor %}
