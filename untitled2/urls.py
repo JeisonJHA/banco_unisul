@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 urlpatterns = [
-    # url(r'^$', include('banco_unisul.urls')),
+    url(r'^', include('banco_unisul.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^banco/', include('banco_unisul.urls')),
 ]

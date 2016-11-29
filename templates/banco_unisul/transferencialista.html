@@ -1,0 +1,7 @@
+{% extends 'banco_unisul/bancoexterno.html' %}
+{% block title %}Transferência{% endblock %}
+{% block body %}
+    <div class="container-fluid">
+        <a href="{% url 'banco_unisul:transferencia-add' conta.id %}">Efetuar transferência</a>
+    </div>
+{% endblock %}

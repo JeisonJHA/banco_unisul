@@ -36,7 +36,8 @@ urlpatterns = [
     url(r'^listaexcluiconta/$', views.ContaExclusao.as_view(), name='listaexcluiconta'),
     url(r'^listaexcluiclientepf/$', views.ListaPFExclusao.as_view(), name='listaexcluiclientepf'),
     url(r'^listaexcluiclientepj/$', views.ListaPJExclusao.as_view(), name='listaexcluiclientepj'),
-
+    url(r'^dadosrelatorio/$', views.DadosRelatorioView.as_view(), name='dadosrelatorio'),
+    url(r'^novaconta/$', views.ContaCreate.as_view(), name='novaconta'),
 
     url(r'^cad_socio/$', views.Cad_SocioView.as_view(), name='cad_socio'),
     url(r'^alt_socio/$', views.SocioUpdate.as_view(), name='alt_socio'),
@@ -47,13 +48,17 @@ urlpatterns = [
     url(r'^alteraclientepf/$', views.AlteraClientePF.as_view(), name='alteraclientepf'),
     url(r'^alteraclientepj/$', views.AlteraClientePJ.as_view(), name='alteraclientepj'),
 
+    url(r'^saque/$', views.SaqueListView.as_view(), name='saque'),
+    url(r'^transferencia/$', views.TransferenciaListView.as_view(), name='transferencia'),
+    url(r'^deposito/$', views.DepositoListView.as_view(), name='deposito'),
+
     url(r'^clientepf/novo/$', views.ClientePFCreate.as_view(), name='clientepf-add'),
-    url(r'clientepj/novo/$', views.ClientePJCreate.as_view(), name='clientepj-add'),
-    url(r'^saque/$', views.SaqueView.as_view(), name='saque-add'),
-    url(r'^transferencia/$', views.TransferenciaView.as_view(), name='transferencia-add'),
-    url(r'^deposito/$', views.DepositoView.as_view(), name='deposito-add'),
+    url(r'^clientepj/novo/$', views.ClientePJCreate.as_view(), name='clientepj-add'),
+    url(r'^saque/(?P<pk>[0-9]+)/$', views.SaqueView.as_view(), name='saque-add'),
+    url(r'^transferencia/(?P<pk>[0-9]+)/$', views.TransferenciaView.as_view(), name='transferencia-add'),
+    url(r'^deposito/(?P<pk>[0-9]+)/$', views.DepositoView.as_view(), name='deposito-add'),
     url(r'^cad_socio/novo/$', views.SocioView.as_view(), name='socio-add'),
-    url(r'^cad_conta/novo/$', views.ContaCreate.as_view(), name='conta-add'),
+    url(r'^cad_conta/novo/(?P<pk>[0-9]+)/$', views.ContaCreate.as_view(), name='conta-add'),
 
     url(r'^clientepf/(?P<pk>[0-9]+)/$', views.ClientePFUpdate.as_view(), name='clientepf-update'),
     url(r'^clientepj/(?P<pk>[0-9]+)/$', views.ClientePJUpdate.as_view(), name='clientepj-update'),

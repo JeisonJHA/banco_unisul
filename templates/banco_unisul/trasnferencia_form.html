@@ -8,10 +8,45 @@
             <div class="col-sm12 col-md-7">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        {% if form.non_field_errors %}
+                            <div class="col-sm-offset-2 col-sm-10">
+                              {% for error in form.non_field_errors %}
+                                  <span class="text-danger small">{{error}}</span>
+                              {% endfor %}
+                            </div>
+                        {% endif %}
 
                         <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {% include 'banco_unisul/form-template.html' %}
+{#                            {% include 'banco_unisul/form-template.html' %}#}
+
+                            {% for field in form %}
+                                {% if field.name == 'origem' %}
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <span class="text-danger small"></span>
+                                        </div>
+                                        <label class="control-label col-sm-2"><label for="id_origem">Origem:</label></label>
+                                        <div class="col-sm-10">
+                                            <select id="id_origem" name="origem" required>
+
+                                                 <option value="1" selected="selected">{{ conta }}</option>
+
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                {% else %}
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <span class="text-danger small">{{ field.errors }}</span>
+                                        </div>
+                                        <label class="control-label col-sm-2">{{ field.label_tag }}</label>
+                                        <div class="col-sm-10">{{ field }}</div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
                             <div class="form-group">
                                 <div class=" col-sm-offset2 col-sm-10">
                                     <button type="submit" class="btn btn-success">Salvar</button>

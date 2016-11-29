@@ -1,6 +1,10 @@
+# coding=utf-8
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
+from django.http import request
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from django.db import models
@@ -81,12 +85,12 @@ class Conta(models.Model):
         from django.urls import reverse
         return reverse('banco_unisul:detalheconta', kwargs={'pk': self.pk})
 
-    # def clean(self):
-    #     from django.core.exceptions import ValidationError
-    #     queryset = Conta.objects.filter(cliente=self.cliente, tpconta=self.tpconta)
-    #     if queryset.exists():
-    #         print 'ERROR!'
-    #         raise ValidationError("This row already exists")
+    def limite(self):
+        if self.flespecial:
+            return self.saldo + self.chespecial
+        else:
+            return self.saldo
+
 
 
 class Socio(models.Model):
@@ -101,23 +105,75 @@ class Socio(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('banco_unisul:detalhepf', kwargs={'pk': self.empresa.id})
+        return reverse('banco_unisul:detalhepj', kwargs={'pk': self.empresa.id})
 
 
 class Trasnferencia(models.Model):
-    origem = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='origemtransferencia')
-    destino = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='destinotransferencia')
+    origem = models.ForeignKey(Conta, on_delete=models.CASCADE, related_name='origemtransferencia')
+    destino = models.ForeignKey(Conta, on_delete=models.CASCADE, related_name='destinotransferencia')
     valor = models.IntegerField()
-    dttransferencia = models.DateTimeField("Data da transferencia")
+    dttransferencia = models.DateTimeField("Data da transferencia", auto_now_add=True)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('banco_unisul:index')
+
+    def clean(self):
+        corigem = Conta.objects.get(cliente=self.origem.cliente)
+        if corigem.limite() < self.valor:
+            raise ValidationError(corigem.cliente.nome + " não possui saldo suficiente.")
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        corigem = Conta.objects.get(cliente=self.origem.cliente)
+        cdestino = Conta.objects.get(cliente=self.destino.cliente)
+        if corigem.limite() >= self.valor:
+            cdestino.saldo += self.valor
+            corigem.saldo -= self.valor
+            corigem.save()
+            cdestino.save()
+        else:
+            raise Exception(corigem.cliente.nome + " não possui saldo suficiente.")
+
+        super(Trasnferencia, self).save(force_insert, force_update, using, update_fields)
 
 class Saque(models.Model):
-    origem = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    origem = models.ForeignKey(Conta, on_delete=models.CASCADE)
     valor = models.IntegerField()
-    dtsaque = models.DateTimeField("Data do saque")
+    dtsaque = models.DateTimeField("Data do saque", auto_now_add=True)
+    template = 'banco_unisul:index'
+
+    def get_absolute_url(self):
+        print('get_absolute_url')
+        from django.urls import reverse
+        return reverse(self.template)
+
+    def clean(self):
+        corigem = Conta.objects.get(cliente=self.origem.cliente)
+        if corigem.limite() < self.valor:
+            raise ValidationError(corigem.cliente.nome + " não possui saldo suficiente.")
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        corigem = Conta.objects.get(cliente=self.origem.cliente)
+        corigem.saldo -= self.valor
+        corigem.save()
+
+        super(Saque, self).save(force_insert, force_update, using, update_fields)
 
 
 class Deposito(models.Model):
-    destino = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    destino = models.ForeignKey(Conta, on_delete=models.CASCADE)
     valor = models.IntegerField()
-    dtdeposito = models.DateTimeField("Data do deposito")
+    dtdeposito = models.DateTimeField("Data do deposito", auto_now_add=True)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('banco_unisul:index')
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        cdestino = Conta.objects.get(cliente=self.destino.cliente)
+        cdestino.saldo += self.valor
+        cdestino.save()
+        super(Deposito, self).save(force_insert, force_update, using, update_fields)

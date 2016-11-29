@@ -1,13 +1,13 @@
-# from django.template import loader
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+# from django.template import loaderfrom django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.views import generic
-from django.views.generic import View
 from django.contrib.auth.models import Group, User
+from django.views.generic import TemplateView
 
 from banco_unisul.forms import UserForm
 from .models import *
@@ -49,7 +49,8 @@ def logout_user(request):
     return render(request, login_template, context)
 
 
-class BasicView(PermissionRequiredMixin, generic.View):
+class BasicView(LoginRequiredMixin, TemplateView):
+    raise_exception = True
     def get(self, request):
         if not request.user.is_authenticated():
             return render(request, login_template)
@@ -67,54 +68,61 @@ class IndexView(generic.View):
             return go_web(request, request.user)
 
 
-class ContaCreate(CreateView):
+class ContaCreate(LoginRequiredMixin, CreateView):
     model = Conta
     fields = ['cliente', 'tpconta', 'saldo', 'flespecial', 'chespecial']
     success_url = reverse_lazy('banco_unisul:index')
 
+    def get_initial(self):
+        try:
+            pk = self.kwargs['pk']
+            return {
+                'cliente': pk,
+            }
+        except:
+            return {}
 
-class ContaUpdate(UpdateView):
+class ContaUpdate(LoginRequiredMixin, UpdateView):
     model = Conta
     fields = ['cliente', 'tpconta', 'saldo', 'flespecial', 'chespecial']
 
 
-class ContaDelete(DeleteView):
+class ContaDelete(LoginRequiredMixin, DeleteView):
     model = Conta
     success_url = reverse_lazy('banco_unisul:index')
 
 
-class ClientePFCreate(CreateView):
+class ClientePFCreate(LoginRequiredMixin, CreateView):
     model = ClientePF
     fields = ['nome', 'endereco', 'agencia', 'CPF']
 
 
-class ClientePFUpdate(UpdateView):
+class ClientePFUpdate(LoginRequiredMixin, UpdateView):
     model = ClientePF
     fields = ['nome', 'endereco', 'agencia', 'CPF']
 
 
-class ClientePFDelete(DeleteView):
+class ClientePFDelete(LoginRequiredMixin, DeleteView):
     model = ClientePF
     success_url = reverse_lazy('banco_unisul:index')
 
 
-class ClientePJCreate(CreateView):
+class ClientePJCreate(LoginRequiredMixin, CreateView):
     model = ClientePJ
     fields = ['nome', 'endereco', 'agencia', 'CNPJ']
 
 
-class ClientePJUpdate(UpdateView):
+class ClientePJUpdate(LoginRequiredMixin, UpdateView):
     model = ClientePJ
     fields = ['nome', 'endereco', 'agencia', 'CNPJ']
 
 
-class ClientePJDelete(DeleteView):
+class ClientePJDelete(LoginRequiredMixin, DeleteView):
     model = ClientePJ
     success_url = reverse_lazy('banco_unisul:index')
 
 
 class Cad_ClienteView(BasicView):
-    permission_required = 'cliente'
     template_name = 'banco_unisul/cad_cliente.html'
     context = {
 
@@ -143,34 +151,66 @@ class RelatorioView(BasicView):
     }
 
 
-class SocioView(CreateView):
+class SocioView(LoginRequiredMixin, CreateView):
     model = Socio
     fields = ['cliente', 'empresa']
 
 
-class SocioUpdate(UpdateView):
+class SocioUpdate(LoginRequiredMixin, UpdateView):
     model = Socio
     fields = ['cliente', 'empresa']
 
 
-class SocioDelete(DeleteView):
+class SocioDelete(LoginRequiredMixin, DeleteView):
     model = Socio
     success_url = reverse_lazy('banco_unisul:index')
 
 
-class SaqueView(CreateView):
+class SaqueView(LoginRequiredMixin, CreateView):
     model = Saque
-    fields = ['origem', 'valor', 'dtsaque']
+    fields = ['origem', 'valor']
+    context_object_name = 'conta'
 
+    def get_context_data(self, **kwargs):
+        print('get_context_data')
+        context = super(SaqueView, self).get_context_data(**kwargs)
+        context['conta'] = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        return context
 
-class DepositoView(CreateView):
+    def get_initial(self):
+        pk = self.kwargs['pk']
+        return {
+            'origem': pk,
+        }
+
+class DepositoView(LoginRequiredMixin, CreateView):
     model = Deposito
-    fields = ['destino', 'valor', 'dtdeposito']
+    fields = ['destino', 'valor']
+
+    def get_initial(self):
+        pk = self.kwargs['pk']
+        return {
+            'destino': pk,
+        }
 
 
-class TransferenciaView(CreateView):
+class TransferenciaView(LoginRequiredMixin, CreateView):
     model = Trasnferencia
-    fields = ['origem', 'destino', 'valor', 'dttransferencia']
+    fields = ['origem', 'destino', 'valor']
+    context_object_name = 'conta'
+
+    def get_context_data(self, **kwargs):
+        print('get_context_data')
+        context = super(TransferenciaView, self).get_context_data(**kwargs)
+        context['conta'] = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        return context
+
+    def get_initial(self):
+        print('get_initial')
+        pk = self.kwargs['pk']
+        return {
+            'origem': pk,
+        }
 
 
 class AlteraClientePF(BasicView):
@@ -197,7 +237,7 @@ class Alt_ContaView(BasicView):
     }
 
 
-class TodosClientesView(generic.ListView):
+class TodosClientesView(LoginRequiredMixin, generic.ListView):
     template_name = 'banco_unisul/todoscliente.html'
     context_object_name = 'todos_clientes'
 
@@ -205,7 +245,7 @@ class TodosClientesView(generic.ListView):
         return Cliente.objects.all()
 
 
-class TodosClientesPJView(generic.ListView):
+class TodosClientesPJView(LoginRequiredMixin, generic.ListView):
     template_name = 'banco_unisul/todosclientepj.html'
     context_object_name = 'todos_clientes'
 
@@ -213,7 +253,7 @@ class TodosClientesPJView(generic.ListView):
         return ClientePJ.objects.all()
 
 
-class DetalhepfView(generic.DetailView):
+class DetalhepfView(LoginRequiredMixin, generic.DetailView):
     model = Cliente
     template_name = 'banco_unisul/detalhepf.html'
 
@@ -223,7 +263,7 @@ class DetalhepfView(generic.DetailView):
         return context
 
 
-class DetalhepjView(generic.DetailView):
+class DetalhepjView(LoginRequiredMixin, generic.DetailView):
     model = Cliente
     template_name = 'banco_unisul/detalhepj.html'
 
@@ -234,12 +274,12 @@ class DetalhepjView(generic.DetailView):
         return context
 
 
-class DetalheContaView(generic.DetailView):
+class DetalheContaView(LoginRequiredMixin, generic.DetailView):
     model = Conta
     template_name = 'banco_unisul/detalheconta.html'
 
 
-class Conta_ClienteView(CreateView):
+class Conta_ClienteView(LoginRequiredMixin, CreateView):
     model = Conta
     fields = ['cliente', 'tpconta', 'saldo', 'flespecial', 'chespecial']
 
@@ -250,7 +290,7 @@ class Conta_ClienteView(CreateView):
         }
 
 
-class EmpresaSocioView(CreateView):
+class EmpresaSocioView(LoginRequiredMixin, CreateView):
     model = Socio
     fields = ['empresa', 'cliente']
 
@@ -261,7 +301,7 @@ class EmpresaSocioView(CreateView):
         }
 
 
-class ListaContaView(generic.ListView):
+class ListaContaView(LoginRequiredMixin, generic.ListView):
     model = Conta
     template_name = 'banco_unisul/listaconta.html'
     context_object_name = 'todos_contas'
@@ -270,7 +310,7 @@ class ListaContaView(generic.ListView):
         return Conta.objects.all()
 
 
-class SocioExclusao(generic.ListView):
+class SocioExclusao(LoginRequiredMixin, generic.ListView):
     model = Socio
     template_name = 'banco_unisul/listaexcluisocio.html'
     context_object_name = 'todos_socios'
@@ -279,7 +319,7 @@ class SocioExclusao(generic.ListView):
         return Socio.objects.all().select_related("cliente")
 
 
-class ContaExclusao(generic.ListView):
+class ContaExclusao(LoginRequiredMixin, generic.ListView):
     model = Socio
     template_name = 'banco_unisul/listaexcluiconta.html'
     context_object_name = 'todas_contas'
@@ -288,7 +328,7 @@ class ContaExclusao(generic.ListView):
         return Conta.objects.all().select_related("cliente")
 
 
-class ListaPFExclusao(generic.ListView):
+class ListaPFExclusao(LoginRequiredMixin, generic.ListView):
     model = Socio
     template_name = 'banco_unisul/listaexcluiuclientepf.html'
     context_object_name = 'todos_clientes'
@@ -297,10 +337,46 @@ class ListaPFExclusao(generic.ListView):
         return ClientePF.objects.all()
 
 
-class ListaPJExclusao(generic.ListView):
+class ListaPJExclusao(LoginRequiredMixin, generic.ListView):
     model = Socio
     template_name = 'banco_unisul/listaexcluiclientepj.html'
     context_object_name = 'todos_clientes'
 
     def get_queryset(self):
         return ClientePJ.objects.all()
+
+
+class DadosRelatorioView(LoginRequiredMixin, generic.ListView):
+    model = Cliente
+    template_name = 'banco_unisul/dadosrelatorio.html'
+    context_object_name = 'dados_relatorio'
+
+    def get_queryset(self):
+        return ClientePJ.objects.all()
+
+
+class SaqueListView(LoginRequiredMixin, generic.ListView):
+    model = Saque
+    template_name = 'banco_unisul/saquelista.html'
+    context_object_name = 'conta'
+
+    def get_queryset(self):
+        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+
+
+class DepositoListView(LoginRequiredMixin, generic.ListView):
+    model = Deposito
+    template_name = 'banco_unisul/depositolista.html'
+    context_object_name = 'conta'
+
+    def get_queryset(self):
+        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+
+
+class TransferenciaListView(LoginRequiredMixin, generic.ListView):
+    model = Trasnferencia
+    template_name = 'banco_unisul/transferencialista.html'
+    context_object_name = 'conta'
+
+    def get_queryset(self):
+        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()

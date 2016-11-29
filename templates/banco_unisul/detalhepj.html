@@ -21,7 +21,7 @@
                 {% if conta.tpconta == 1 and conta.flespecial %}Cheque especial R$ {{ conta.chespecial }}<br>{% endif %}
             {% endfor %}
         {% else %}
-            <a href="{% url 'banco_unisul:conta-add' cliente.id %}"><span aria-hidden="true"></span>&nbsp; Criar Conta</a>
+            <a href="{% url 'banco_unisul:conta-add' cliente.id %}"><span aria-hidden="true"></span>Criar Conta</a>
         {% endif %}
         {% if socios %}
             <h3>Sócios</h3>
@@ -35,6 +35,7 @@
             <p>
                 Esta empresa não possui sócios
             </p>
+            <a href="{% url 'banco_unisul:empresa_socio' cliente.id %}">Adicionar Sócio</a>
         {% endif %}
 
     </div>
