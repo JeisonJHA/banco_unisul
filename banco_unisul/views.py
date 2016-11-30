@@ -1,14 +1,9 @@
-# from django.template import loaderfrom django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth import authenticate, login, logout
 from django.views import generic
-from django.contrib.auth.models import Group, User
 from django.views.generic import TemplateView
-
 from banco_unisul.forms import UserForm
 from .models import *
 
@@ -19,7 +14,11 @@ def go_web(request, user):
     if user.groups.filter(name='gerente').exists():
         return render(request, 'banco_unisul/bancointero.html')
     elif user.groups.filter(name='cliente').exists():
-        return render(request, 'banco_unisul/bancoexterno.html')
+        try:
+            conta = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=user.first_name).get()
+            return render(request, 'banco_unisul/bancoexterno.html', {'conta': conta})
+        except:
+            return render(request, 'banco_unisul/bancoexterno.html')
     else:
         return render(request, login_template)
 
@@ -51,6 +50,7 @@ def logout_user(request):
 
 class BasicView(LoginRequiredMixin, TemplateView):
     raise_exception = True
+
     def get(self, request):
         if not request.user.is_authenticated():
             return render(request, login_template)
@@ -70,7 +70,7 @@ class IndexView(generic.View):
 
 class ContaCreate(LoginRequiredMixin, CreateView):
     model = Conta
-    fields = ['cliente', 'tpconta', 'saldo', 'flespecial', 'chespecial']
+    fields = ['cliente', 'agencia', 'tpconta', 'saldo', 'flespecial', 'chespecial']
     success_url = reverse_lazy('banco_unisul:index')
 
     def get_initial(self):
@@ -82,9 +82,10 @@ class ContaCreate(LoginRequiredMixin, CreateView):
         except:
             return {}
 
+
 class ContaUpdate(LoginRequiredMixin, UpdateView):
     model = Conta
-    fields = ['cliente', 'tpconta', 'saldo', 'flespecial', 'chespecial']
+    fields = ['cliente', 'agencia', 'tpconta', 'saldo', 'flespecial', 'chespecial']
 
 
 class ContaDelete(LoginRequiredMixin, DeleteView):
@@ -94,12 +95,12 @@ class ContaDelete(LoginRequiredMixin, DeleteView):
 
 class ClientePFCreate(LoginRequiredMixin, CreateView):
     model = ClientePF
-    fields = ['nome', 'endereco', 'agencia', 'CPF']
+    fields = ['nome', 'endereco', 'dtnascimento', 'CPF']
 
 
 class ClientePFUpdate(LoginRequiredMixin, UpdateView):
     model = ClientePF
-    fields = ['nome', 'endereco', 'agencia', 'CPF']
+    fields = ['nome', 'endereco', 'dtnascimento', 'CPF']
 
 
 class ClientePFDelete(LoginRequiredMixin, DeleteView):
@@ -109,12 +110,12 @@ class ClientePFDelete(LoginRequiredMixin, DeleteView):
 
 class ClientePJCreate(LoginRequiredMixin, CreateView):
     model = ClientePJ
-    fields = ['nome', 'endereco', 'agencia', 'CNPJ']
+    fields = ['nome', 'endereco', 'CNPJ']
 
 
 class ClientePJUpdate(LoginRequiredMixin, UpdateView):
     model = ClientePJ
-    fields = ['nome', 'endereco', 'agencia', 'CNPJ']
+    fields = ['nome', 'endereco', 'CNPJ']
 
 
 class ClientePJDelete(LoginRequiredMixin, DeleteView):
@@ -174,7 +175,9 @@ class SaqueView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         print('get_context_data')
         context = super(SaqueView, self).get_context_data(**kwargs)
-        context['conta'] = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        context['conta'] = ClientePF.objects.prefetch_related('socio_set__cliente__conta_set').get(
+            nome=self.request.user.first_name)
+        # context['conta'] = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user.first_name).get()
         return context
 
     def get_initial(self):
@@ -182,6 +185,7 @@ class SaqueView(LoginRequiredMixin, CreateView):
         return {
             'origem': pk,
         }
+
 
 class DepositoView(LoginRequiredMixin, CreateView):
     model = Deposito
@@ -200,13 +204,12 @@ class TransferenciaView(LoginRequiredMixin, CreateView):
     context_object_name = 'conta'
 
     def get_context_data(self, **kwargs):
-        print('get_context_data')
         context = super(TransferenciaView, self).get_context_data(**kwargs)
-        context['conta'] = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        context['conta'] = ClientePF.objects.prefetch_related( 'socio_set__cliente__conta_set').get(nome=self.request.user.first_name)
+        context['destino'] = Conta.objects.all().select_related("cliente").exclude(cliente__nome__exact=self.request.user.first_name).all()
         return context
 
     def get_initial(self):
-        print('get_initial')
         pk = self.kwargs['pk']
         return {
             'origem': pk,
@@ -281,7 +284,7 @@ class DetalheContaView(LoginRequiredMixin, generic.DetailView):
 
 class Conta_ClienteView(LoginRequiredMixin, CreateView):
     model = Conta
-    fields = ['cliente', 'tpconta', 'saldo', 'flespecial', 'chespecial']
+    fields = ['cliente', 'agencia', 'tpconta', 'saldo', 'flespecial', 'chespecial']
 
     def get_initial(self):
         pk = self.kwargs['pk']
@@ -361,7 +364,7 @@ class SaqueListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'conta'
 
     def get_queryset(self):
-        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user.first_name).get()
 
 
 class DepositoListView(LoginRequiredMixin, generic.ListView):
@@ -370,7 +373,8 @@ class DepositoListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'conta'
 
     def get_queryset(self):
-        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        print(self.request.user.first_name)
+        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user.first_name).get()
 
 
 class TransferenciaListView(LoginRequiredMixin, generic.ListView):
@@ -379,4 +383,28 @@ class TransferenciaListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'conta'
 
     def get_queryset(self):
-        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        return Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user.first_name).get()
+
+
+class SaldoClientesView(LoginRequiredMixin, generic.ListView):
+    model = Trasnferencia
+    template_name = 'banco_unisul/saldoclientes.html'
+    context_object_name = 'conta'
+
+    def get_queryset(self):
+        return Conta.objects.all().select_related("cliente").all()
+
+
+class TotalContasView(LoginRequiredMixin, generic.ListView):
+    model = Trasnferencia
+    template_name = 'banco_unisul/totalcontas.html'
+    context_object_name = 'conta'
+
+    def get_queryset(self):
+        return Conta.objects.all().order_by('tpconta')
+
+    def get_context_data(self, **kwargs):
+        context = super(TotalContasView, self).get_context_data(**kwargs)
+        context['CC'] = Conta.objects.all().order_by('tpconta').filter(tpconta=1).count()
+        context['CP'] = Conta.objects.all().order_by('tpconta').filter(tpconta=2).count()
+        return context

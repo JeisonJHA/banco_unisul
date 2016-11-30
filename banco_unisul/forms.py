@@ -8,21 +8,21 @@ class ClientePFForm(forms.ModelForm):
 
     class Meta:
         model = ClientePF
-        fields = ['nome', 'endereco', 'agencia', 'CPF']
+        fields = ['nome', 'endereco', 'dtnascimento', 'CPF']
 
 
 class ClientePJForm(forms.ModelForm):
 
     class Meta:
         model = ClientePJ
-        fields = ['nome', 'endereco', 'agencia', 'CNPJ']
+        fields = ['nome', 'endereco', 'CNPJ']
 
 
 class ContaForm(forms.ModelForm):
 
     class Meta:
         model = Conta
-        fields = ['cliente', 'saldo', 'tpconta', 'flespecial', 'chespecial']
+        fields = ['cliente', 'agencia', 'saldo', 'tpconta', 'flespecial', 'chespecial']
 
 
 class SocioForm(forms.ModelForm):

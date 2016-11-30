@@ -38,6 +38,9 @@ urlpatterns = [
     url(r'^listaexcluiclientepj/$', views.ListaPJExclusao.as_view(), name='listaexcluiclientepj'),
     url(r'^dadosrelatorio/$', views.DadosRelatorioView.as_view(), name='dadosrelatorio'),
     url(r'^novaconta/$', views.ContaCreate.as_view(), name='novaconta'),
+    url(r'^saldoclientes/$', views.SaldoClientesView.as_view(), name='saldoclientes'),
+    url(r'^totalcontas/$', views.TotalContasView.as_view(), name='totalcontas'),
+
 
     url(r'^cad_socio/$', views.Cad_SocioView.as_view(), name='cad_socio'),
     url(r'^alt_socio/$', views.SocioUpdate.as_view(), name='alt_socio'),

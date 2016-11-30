@@ -15,7 +15,6 @@ from django.db import models
 class Cliente(models.Model):
     nome = models.CharField(max_length=200)
     endereco = models.CharField(max_length=200)
-    agencia = models.CharField(max_length=10)
 
     def __str__(self):
         return self.nome
@@ -31,7 +30,8 @@ class Cliente(models.Model):
              update_fields=None):
         if not self.pk:
             from django.contrib.auth.models import User
-            user = User.objects.create_user(self.nome, password='pass1234')
+            user = User.objects.create_user(''.join(self.nome.lower().split()), password='pass1234')
+            user.first_name = self.nome
             user.groups.add(Group.objects.get(name='cliente'))
             user.save()
         super(Cliente, self).save(force_insert, force_update, using, update_fields)
@@ -41,7 +41,8 @@ class Cliente(models.Model):
 
 
 class ClientePF(Cliente):
-    CPF = models.CharField(max_length=30, unique=True)
+    CPF = models.CharField(max_length=11, unique=True)
+    dtnascimento = models.DateField("Data de Nascimento")
 
     def __str__(self):
         return self.nome
@@ -60,12 +61,19 @@ class ClientePJ(Cliente):
         from django.urls import reverse
         return reverse('banco_unisul:detalhepj', kwargs={'pk': self.pk})
 
+class Agencia(models.Model):
+    agencia = models.CharField(max_length=10)
+
+    def __str__(self):
+        return 'Agencia ' + str(self.agencia)
+
 
 class Conta(models.Model):
     TIPO_CONTA = (
         (1, 'ContaCorrente'),
         (2, 'ContaPoupanca'),
     )
+    agencia = models.ForeignKey(Agencia, on_delete=models.CASCADE)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     tpconta = models.IntegerField("Tipo da Conta", choices=TIPO_CONTA)
     saldo = models.IntegerField()
@@ -114,6 +122,10 @@ class Trasnferencia(models.Model):
     valor = models.IntegerField()
     dttransferencia = models.DateTimeField("Data da transferencia", auto_now_add=True)
 
+    def __str__(self):
+        return self.origem.__str__() + " para " + self.destino.__str__() + " em " + \
+               self.dttransferencia.strftime("%d/%m/%y %H:%M:%S")
+
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('banco_unisul:index')
@@ -122,6 +134,9 @@ class Trasnferencia(models.Model):
         corigem = Conta.objects.get(cliente=self.origem.cliente)
         if corigem.limite() < self.valor:
             raise ValidationError(corigem.cliente.nome + " não possui saldo suficiente.")
+
+        if self.origem == self.destino:
+            raise ValidationError("Não é possível efetuar transferência para a mesma conta.")
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

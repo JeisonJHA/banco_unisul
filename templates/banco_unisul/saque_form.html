@@ -1,5 +1,6 @@
 {% extends 'banco_unisul/bancoexterno.html' %}
 {% block title %}Saque{% endblock %}
+{% block saque %}active{% endblock %}
 
 {% block body %}
     <div class="container-fluid">
@@ -18,7 +19,6 @@
 
                         <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-{#                            {% include 'banco_unisul/form-template.html' %}#}
                             {% for field in form %}
                                 {% if field.name == 'origem' %}
                                     <div class="form-group">
@@ -27,11 +27,17 @@
                                         </div>
                                         <label class="control-label col-sm-2"><label for="id_origem">Origem:</label></label>
                                         <div class="col-sm-10">
-                                            <select id="id_origem" name="origem" required>
-
-                                                 <option value="1" selected="selected">{{ conta }}</option>
-
+                                            <select id="id_{{ field.name }}" name="{{ field.name }}" required>
+                                                <option value="{{ conta.conta_set.get.id }}" selected="selected">{{ conta.conta_set.get }}</option>
+                                                {% if conta.socio_set.all %}
+                                                    {% for socio in conta.socio_set.all %}
+                                                        <option value="{{ socio.empresa.conta_set.get.id }}" selected="selected">{{ socio.empresa.conta_set.get }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
                                             </select>
+{#                                            <select id="id_origem" name="origem" required>#}
+{#                                                 <option value="1" selected="selected">{{ conta }}</option>#}
+{#                                            </select>#}
                                         </div>
 
                                     </div>

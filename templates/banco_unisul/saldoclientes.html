@@ -1,0 +1,21 @@
+{% extends 'banco_unisul/bancointero.html' %}
+{% block relatorio %}active{% endblock %}
+{% block title %}Lista Contas{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        {% for c in conta %}
+            <div>
+                <p>
+                    Nome: {{ c.cliente }} <br>
+                    Conta: {{ c.id }} <br>
+                    {{ c.get_tpconta_display }} <br>
+                    Saldo: {{ c.saldo }} <br>
+                    {% if c.flespecial %}
+                        Limite com cheque especial {{ c.limite }}<br>
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

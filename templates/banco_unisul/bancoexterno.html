@@ -1,6 +1,20 @@
 {% extends 'banco_unisul/base.html' %}
+{% block index %}active{% endblock %}
 {% block menu %}
-<li class="{% block cad_cliente %}{% endblock %}"><a href="{% url 'banco_unisul:deposito' %}"><span aria-hidden="true"></span>&nbsp; Deposito</a></li>
-<li class="{% block cad_conta %}{% endblock %}"><a href="{% url 'banco_unisul:transferencia' %}"><span aria-hidden="true"></span>&nbsp; Transferencia</a></li>
-<li class="{% block cad_socio %}{% endblock %}"><a href="{% url 'banco_unisul:saque' %}"><span aria-hidden="true"></span>&nbsp; Saque</a></li>
+<li class="{% block deposito %}{% endblock %}"><a href="{% url 'banco_unisul:deposito' %}"><span aria-hidden="true"></span>&nbsp; Deposito</a></li>
+<li class="{% block transferencia%}{% endblock %}"><a href="{% url 'banco_unisul:transferencia' %}"><span aria-hidden="true"></span>&nbsp; Transferencia</a></li>
+<li class="{% block saque %}{% endblock %}"><a href="{% url 'banco_unisul:saque' %}"><span aria-hidden="true"></span>&nbsp; Saque</a></li>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>Nome</h1>
+        <h4>{{ conta.cliente.nome }}</h4>
+        <h1>Saldo na conta</h1>
+        <h4 class="{% if conta.saldo < 0 %}text-danger{% endif %}">{{ conta.saldo }}</h4>
+        {% if conta.flespecial %}
+            <h1>Saldo com cheque especial</h1>
+            <h4>{{ conta.limite }}</h4>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,5 +1,7 @@
 {% extends 'banco_unisul/bancoexterno.html' %}
 {% block title %}Deposito{% endblock %}
+{% block deposito %}active{% endblock %}
+
 {% block body %}
     <div class="container-fluid">
         <a href="{% url 'banco_unisul:deposito-add' conta.id %}">Efetuar depósito</a>

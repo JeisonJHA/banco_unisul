@@ -1,0 +1,31 @@
+{% extends 'banco_unisul/bancointero.html' %}
+{% block relatorio %}active{% endblock %}
+{% block title %}Lista Contas{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        {% if CC >= 1 %}
+            <p>
+                Quantidade de Conta Corrente: {{ CC }}
+            </p>
+            {% for c in conta %}
+                {% if c.tpconta == 1 %}
+                    {{ c }}<br>
+                {% endif %}
+            {% endfor %}
+            <br>
+        {% endif %}
+
+        {% if CC >= 1 %}
+            <p>
+                Quantidade de Conta Poupança: {{ CP }}
+            </p>
+
+            {% for c in conta %}
+                {% if c.tpconta == 2 %}
+                    {{ c }}<br>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

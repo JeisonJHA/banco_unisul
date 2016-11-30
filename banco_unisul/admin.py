@@ -10,4 +10,4 @@ admin.site.register(Socio)
 admin.site.register(Trasnferencia)
 admin.site.register(Deposito)
 admin.site.register(Saque)
-
+admin.site.register(Agencia)
