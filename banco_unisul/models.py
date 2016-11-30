@@ -114,6 +114,10 @@ class Trasnferencia(models.Model):
     valor = models.IntegerField()
     dttransferencia = models.DateTimeField("Data da transferencia", auto_now_add=True)
 
+    def __str__(self):
+        return self.origem.__str__() + " para " + self.destino.__str__() + " em " + \
+               self.dttransferencia.strftime("%d/%m/%y %H:%M:%S")
+
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('banco_unisul:index')
@@ -122,6 +126,9 @@ class Trasnferencia(models.Model):
         corigem = Conta.objects.get(cliente=self.origem.cliente)
         if corigem.limite() < self.valor:
             raise ValidationError(corigem.cliente.nome + " não possui saldo suficiente.")
+
+        if self.origem == self.destino:
+            raise ValidationError("Não é possível efetuar transferência para a mesma conta.")
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

@@ -1,14 +1,9 @@
-# from django.template import loaderfrom django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth import authenticate, login, logout
 from django.views import generic
-from django.contrib.auth.models import Group, User
 from django.views.generic import TemplateView
-
 from banco_unisul.forms import UserForm
 from .models import *
 
@@ -19,7 +14,8 @@ def go_web(request, user):
     if user.groups.filter(name='gerente').exists():
         return render(request, 'banco_unisul/bancointero.html')
     elif user.groups.filter(name='cliente').exists():
-        return render(request, 'banco_unisul/bancoexterno.html')
+        conta = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=user).get()
+        return render(request, 'banco_unisul/bancoexterno.html', {'conta': conta})
     else:
         return render(request, login_template)
 
@@ -51,6 +47,7 @@ def logout_user(request):
 
 class BasicView(LoginRequiredMixin, TemplateView):
     raise_exception = True
+
     def get(self, request):
         if not request.user.is_authenticated():
             return render(request, login_template)
@@ -81,6 +78,7 @@ class ContaCreate(LoginRequiredMixin, CreateView):
             }
         except:
             return {}
+
 
 class ContaUpdate(LoginRequiredMixin, UpdateView):
     model = Conta
@@ -183,6 +181,7 @@ class SaqueView(LoginRequiredMixin, CreateView):
             'origem': pk,
         }
 
+
 class DepositoView(LoginRequiredMixin, CreateView):
     model = Deposito
     fields = ['destino', 'valor']
@@ -200,13 +199,12 @@ class TransferenciaView(LoginRequiredMixin, CreateView):
     context_object_name = 'conta'
 
     def get_context_data(self, **kwargs):
-        print('get_context_data')
         context = super(TransferenciaView, self).get_context_data(**kwargs)
         context['conta'] = Conta.objects.all().select_related("cliente").filter(cliente__nome__exact=self.request.user).get()
+        context['destino'] = Conta.objects.all().select_related("cliente").exclude(cliente__nome__exact=self.request.user).all()
         return context
 
     def get_initial(self):
-        print('get_initial')
         pk = self.kwargs['pk']
         return {
             'origem': pk,

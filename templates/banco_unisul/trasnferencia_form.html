@@ -1,5 +1,6 @@
 {% extends 'banco_unisul/bancoexterno.html' %}
 {% block title %}Transferência{% endblock %}
+{% block transferencia %}active{% endblock %}
 
 {% block body %}
     <div class="container-fluid">
@@ -18,21 +19,25 @@
 
                         <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-{#                            {% include 'banco_unisul/form-template.html' %}#}
-
                             {% for field in form %}
-                                {% if field.name == 'origem' %}
+                                {% if field.name == 'origem' or field.name == 'destino' %}
                                     <div class="form-group">
                                         <div class="col-sm-offset-2 col-sm-10">
                                             <span class="text-danger small"></span>
                                         </div>
-                                        <label class="control-label col-sm-2"><label for="id_origem">Origem:</label></label>
+                                        <label class="control-label col-sm-2"><label for="id_{{ field.name }}">{{ field.name.title }}:</label></label>
                                         <div class="col-sm-10">
-                                            <select id="id_origem" name="origem" required>
-
-                                                 <option value="1" selected="selected">{{ conta }}</option>
-
+                                            {% if field.name == 'origem' %}
+                                            <select id="id_{{ field.name }}" name="{{ field.name }}" required>
+                                                <option value="1" selected="selected">{{ conta }}</option>
                                             </select>
+                                            {% elif field.name == 'destino' %}
+                                            <select id="id_{{ field.name }}" name="{{ field.name }}" required>
+                                                {% for usuario in destino %}
+                                                    <option value="{{ usuario.id }}" selected="">{{ usuario }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            {% endif %}
                                         </div>
 
                                     </div>

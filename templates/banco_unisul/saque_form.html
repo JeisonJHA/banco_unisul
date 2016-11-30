@@ -1,5 +1,6 @@
 {% extends 'banco_unisul/bancoexterno.html' %}
 {% block title %}Saque{% endblock %}
+{% block saque %}active{% endblock %}
 
 {% block body %}
     <div class="container-fluid">
@@ -18,7 +19,6 @@
 
                         <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-{#                            {% include 'banco_unisul/form-template.html' %}#}
                             {% for field in form %}
                                 {% if field.name == 'origem' %}
                                     <div class="form-group">
